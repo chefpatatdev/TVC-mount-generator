@@ -21,9 +21,10 @@ $$(x_2-x_3)^2+(y_2-y_3)^2=L3^2$$
 Taking the intersection of these two equation gives 2 points. The one with the lowest y coordinate is P2.
 
 $$\alpha = sin^{-1}(\frac{x_2-x_3}{L3})$$
-
-## Relation
+![alt text](media/simulation.PNG)
+## Relation (work in progress)
 This is the desired relation that the designer predefines and wants the mount to have.
+
 $$\theta\in[\theta_{min};\theta_{max}]$$
 $$\alpha\in[\alpha_{min};\alpha_{max}]$$
 

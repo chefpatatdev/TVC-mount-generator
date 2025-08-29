@@ -81,6 +81,7 @@ class TVCModel:
     def simulate_kinematics(self): #calculate kinematics of the mount
         if not hasattr(self, 'relation'):
             print("Relation not set. Please set the relation first.")
+            print("Set range of theta to determine simulation range, alpha can be random if no optimal design is required")
             return
 
         L1 = self.design_params.get('L1', 0)
@@ -123,7 +124,7 @@ class TVCModel:
             return
 
         # Plot the simulated alpha values
-        plt.plot(self.theta_values_relation, self.alpha_values_relation, label='Desired relation', color='blue', linestyle='--')
+        # plt.plot(self.theta_values_relation, self.alpha_values_relation, label='Desired relation', color='blue', linestyle='--') #TODO
         plt.plot(self.theta_values_relation, self.alpha_values_simulated, label='Simulated relation', color='red')
         plt.xlabel('Theta (degrees)')
         plt.ylabel('Alpha (degrees)')
