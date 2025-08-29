@@ -10,20 +10,25 @@ Also S2_y needs to be constraint to S2_y = L1+L3.
 ### L1 changing
 What happends when L1 changes length, but rest stays constant?
 It seems like changing L1 has a great influence on the kinematic model. Keeping L1 smaller makes the model more linear, so is preferred. This will be used as design DOF.
+
 ![alt text](media/L1_change.png)
 
 ### L2 changing
 What happends when L2 changes length, but rest stays constant?
 The influence of L2 is neiglible and wont be used as design DOF. Here it is better to not make L2 small in comparison to the other linkages, else non linearities start to occur on the ends of the ranges of the servo angle.
+
 ![alt text](media/L2_change.png)
+
 ### L3 changing
 What happends when L3 changes length, but rest stays constant?
 Changing L3 influences the kinematic model significant, so can be used as design DOF.
+
 ![alt text](media/L3_change.png)
 
 ### S2_x changing
 What happends when S2_x changes location, but rest stays constant?
 influence is neiglible, the reason is because of the constraint, in the background L2 changes which also had little influence.
+
 ![alt text](media/S2_x_change.png)
 
 ### S2_y changing
