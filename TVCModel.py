@@ -172,3 +172,94 @@ class TVCModel:
         else:
             print("Warning: failed chaing S2_y, L3 would become negative")
             return
+        
+    def calculate_mean_square_error(self, ideal_range, actual_range):
+        sum = 0
+        if len(ideal_range) != len(actual_range):
+            print("Error: actual_range has gaps -> not suitable")
+            return 100 # High error for unsuitable ranges
+
+        if None in actual_range:
+            return 100 # High error for unsuitable ranges
+
+        for i in range(len(ideal_range)):
+            sum += (ideal_range[i] - actual_range[i])**2
+
+        return round(sum/len(ideal_range),2)
+    
+    def calculate_grid(self, L1_min, L1_max, L3_min, L3_max, grid_size): #calculate grid of models with L1 and L3
+        L1_values = np.linspace(L1_min, L1_max, grid_size)
+        L3_values = np.linspace(L3_min, L3_max, grid_size)
+        return L1_values, L3_values
+
+    def optimize(self, L1_min, L1_max, L3_min, L3_max, grid_size):
+        self.L1_values, self.L3_values = self.calculate_grid(L1_min, L1_max, L3_min, L3_max, grid_size)
+        self.MSE_grid = np.zeros((grid_size, grid_size))
+        for i, L1 in enumerate(self.L1_values):
+            self.set_L1(L1)
+            for j, L3 in enumerate(self.L3_values):
+                self.set_L3(L3)
+                self.simulate_kinematics()
+                error = self.calculate_mean_square_error(self.alpha_values_relation, self.alpha_values_simulated)
+                self.MSE_grid[i, j] = error
+
+        #find minimal MSE value in grid
+        min_index = np.unravel_index(np.nanargmin(self.MSE_grid), self.MSE_grid.shape)
+        self.optimal_L1 = self.L1_values[min_index[0]]
+        self.optimal_L3 = self.L3_values[min_index[1]]
+        self.set_L1(self.optimal_L1)
+        self.set_L3(self.optimal_L3)
+        self.simulate_kinematics()
+        self.MSE_optimal = self.calculate_mean_square_error(self.alpha_values_relation, self.alpha_values_simulated)
+        print(f"Optimal L1: {self.optimal_L1}, Optimal L3: {self.optimal_L3}, MSE: {self.MSE_optimal}")
+
+        print("Successfully optimized TVC model")
+
+    def plot_heatmap(self):
+        if self.L1_values is None or self.L3_values is None or self.MSE_grid is None:
+            print("Error: Missing data for heatmap, run the optimization first")
+            return
+
+        #make sure latest model is the optimized one
+        self.set_L1(self.optimal_L1)
+        self.set_L3(self.optimal_L3)
+        self.simulate_kinematics()
+
+        import plotly.graph_objects as go
+        from plotly.subplots import make_subplots
+        fig = make_subplots(rows=1, cols=2, subplot_titles=("Mean Square Error for different L1 and L3 values", "Kinematic simulation of TVC mount"),horizontal_spacing=0.15)
+
+
+        #plot heatmap
+        fig.add_trace(go.Heatmap(z=self.MSE_grid,
+                        x=self.L1_values,
+                        y=self.L3_values,
+                        colorscale="turbo",
+                        colorbar=dict(
+                            x=0.45,
+                            title='MSE'),
+                        ),
+                        row = 1, col = 1)
+        # plot simualted range of alpha and ideal range of alpha
+        fig.add_trace(go.Scatter(x=self.theta_values_relation, y=self.alpha_values_simulated,mode="lines",name="Simulated range"),row = 1, col = 2)
+        fig.add_trace(go.Scatter(x=self.theta_values_relation,
+                                y=self.alpha_values_relation,
+                                mode="lines",name="Desired range"),
+                                row = 1, col = 2)
+        fig.update_layout(legend=dict(
+        yanchor="top",
+        y=0.99,
+        xanchor="left",
+        x=0.58
+    ))
+
+        fig.update_xaxes(title_text="L1 (mm)", row=1, col=1)
+        fig.update_yaxes(title_text="L3 (mm)", row=1, col=1)
+        fig.update_xaxes(title_text="Theta (°)", row=1, col=2)
+        fig.update_yaxes(title_text="Alpha (°)", row=1, col=2)
+
+        #make text larger
+        for annotation in fig['layout']['annotations']:
+            annotation['font'] = dict(size=20)
+        fig.update_layout(font=dict(size=15))
+        fig.show()
