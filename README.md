@@ -13,6 +13,7 @@ First step is to find the P1 coordinates.
 
 $$x_1 = L1 \sin(\theta)$$
 $$y_1 = L1 \cos(\theta)$$
+
 This is now the center of the circle which P2 can evolve around.
 P2 is at the intersection of this circle and the circle where P2 evolves around S2.
 
