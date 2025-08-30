@@ -63,11 +63,16 @@ class TVCModel:
             xvec = c0 + (d**2 - r1**2 + r0**2)*u/(2*d)
         
             uperp = np.array([u[1], -u[0]])
-            a = ((-d+r1-r0)*(-d-r1+r0)*(-d+r1+r0)*(d+r1+r0))**0.5/d
-            intersections = (xvec + a*uperp/2, xvec - a*uperp/2)
-            return intersections
 
-    def set_relation(self, theta_min, theta_max, alpha_min, alpha_max):
+            value = ((-d+r1-r0)*(-d-r1+r0)*(-d+r1+r0)*(d+r1+r0))
+            if value >= 0:
+                a = value**0.5/d
+                intersections = (xvec + a*uperp/2, xvec - a*uperp/2)
+                return intersections
+            else:
+                return None
+
+    def set_relation(self, theta_min, theta_max, alpha_min=None, alpha_max=None):
         self.relation = {
             "theta_min": theta_min,
             "theta_max": theta_max,
@@ -77,7 +82,8 @@ class TVCModel:
         self.points = 100 #amount of discrete values
 
         self.theta_values_relation = np.linspace(self.relation["theta_min"], self.relation["theta_max"], self.points)
-        self.alpha_values_relation = np.linspace(self.relation["alpha_min"], self.relation["alpha_max"], self.points)
+        if alpha_min is not None and alpha_max is not None:
+            self.alpha_values_relation = np.linspace(self.relation["alpha_min"], self.relation["alpha_max"], self.points)
 
     def simulate_kinematics(self): #calculate kinematics of the mount
         if not hasattr(self, 'relation'):
@@ -204,7 +210,9 @@ class TVCModel:
                 self.MSE_grid[i, j] = error
 
         #find minimal MSE value in grid
+        
         min_index = np.unravel_index(np.nanargmin(self.MSE_grid), self.MSE_grid.shape)
+        print(f"Minimum MSE found at index: {min_index} with value: {self.MSE_grid[min_index]}")
         self.optimal_L1 = self.L1_values[min_index[0]]
         self.optimal_L3 = self.L3_values[min_index[1]]
         self.set_L1(self.optimal_L1)
@@ -232,8 +240,8 @@ class TVCModel:
 
         #plot heatmap
         fig.add_trace(go.Heatmap(z=self.MSE_grid,
-                        x=self.L1_values,
-                        y=self.L3_values,
+                        x=self.L3_values,
+                        y=self.L1_values,
                         colorscale="turbo",
                         colorbar=dict(
                             x=0.45,
@@ -253,8 +261,8 @@ class TVCModel:
         x=0.58
     ))
 
-        fig.update_xaxes(title_text="L1 (mm)", row=1, col=1)
-        fig.update_yaxes(title_text="L3 (mm)", row=1, col=1)
+        fig.update_xaxes(title_text="L3 (mm)", row=1, col=1)
+        fig.update_yaxes(title_text="L1 (mm)", row=1, col=1)
         fig.update_xaxes(title_text="Theta (°)", row=1, col=2)
         fig.update_yaxes(title_text="Alpha (°)", row=1, col=2)
 
