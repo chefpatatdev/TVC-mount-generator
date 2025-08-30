@@ -24,10 +24,10 @@ Taking the intersection of these two equation gives 2 points. The one with the l
 
 $$\alpha = sin^{-1}(\frac{x_2-x_3}{L3})$$
 ![alt text](media/simulation.PNG)
-## Relation (work in progress)
-This is the desired relation that the designer predefines and wants the mount to have.
+## Automatic design 
+You can generate a TVC with a desired behavior. Take a look at the "optimization_example.py" on how to use it.
+First, define a desired relation $\theta$ and $\alpha$. Also, give it a range of $L1$ and $L3$ values with a gridsize.
 
-$$\theta\in[\theta_{min};\theta_{max}]$$
-$$\alpha\in[\alpha_{min};\alpha_{max}]$$
+The algorithm creates a 2D grid of discrete values of $L1$ and $L3$ where it simulates the model and calculates the MSE between the model and the desired relation. At the end it takes the cell, the model, with the lowest MSE as best approximation. It is possible that the values you gave the algorithm cannot produce a good approximation of your desired relation. In that case you will need to change the parameters. This can be increasing the range of $L1$ or/and $L3$, relaxing the relation(=making the slope steeper). 
 
-![alt text](media/relation_example.png)
+![alt text](media/design.png)
