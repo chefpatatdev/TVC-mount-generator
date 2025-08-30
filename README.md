@@ -9,7 +9,7 @@ Goal is to generate a TVC mount that approximates your desired behaviour!
 ## Mathmatical description of kinematics
 This is a 3 bar linkage system. Known variables are $S1,S2,L1,L2,L3,\theta$.
 
-First step is to find the P1 coordinates:
+First step is to find the P1 coordinates.
 
 $$x_1 = L1*sin(\theta)$$
 $$y_1 = L1*cos(\theta)$$
