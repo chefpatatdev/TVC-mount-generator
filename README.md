@@ -24,7 +24,7 @@ Taking the intersection of these two equation gives 2 points. The one with the l
 
 $$\alpha = sin^{-1}(\frac{x_2-x_3}{L3})$$
 
-![alt text](media/simulation.PNG)
+![alt text](media/simulation.png)
 
 ## Automatic design 
 You can generate a TVC with a desired behavior. Take a look at the "optimization_example.py" on how to use it.
