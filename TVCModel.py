@@ -1,6 +1,7 @@
 import json
 import os
 import numpy as np
+import matplotlib.pyplot as plt
 
 class TVCModel:
     def __init__(self, design_file=None):
@@ -16,6 +17,7 @@ class TVCModel:
         try:
             with open(self.design_file, 'r') as f:
                 self.design_params = json.load(f)
+                #TODO: add S2x and S2y check for constraint
         except FileNotFoundError:
             self.design_params = {}
             print(f"Design file {self.design_file} not found. Exiting...")
@@ -33,17 +35,16 @@ class TVCModel:
         self.save_design()
 
     def save_design(self): # Save the design parameters to the JSON file
-        
         with open(self.design_file, 'w') as f:
             json.dump(self.design_params, f)
 
     def create_example_design_file(self): #generate example design file
         self.design_params = {
-            "L1": 100,
-            "L2": 200,
-            "L3": 300,
-            "S2_x": 50,
-            "S2_y": 75
+            "L1": 10,
+            "L2": 30,
+            "L3": 15,
+            "S2_x": 30,
+            "S2_y": 25
         }
 
         with open("design.json", 'w') as f:
@@ -117,8 +118,22 @@ class TVCModel:
         # Store the calculated alpha range
         self.alpha_values_simulated = alpha_range.copy()
 
+    def add_plot_results(self, label,x_data=None,y_data=None): #adds plots to the results plot
+        if label == '':
+            label = 'Kinematic model of plate'
+        if x_data is not None and y_data is not None:
+            plt.plot(x_data,y_data,label=label)
+
+    def show_plot(self):
+        plt.legend()
+        plt.title('Kinematic model of TVC mount')
+        plt.xlim(self.relation["theta_min"],self.relation["theta_max"])
+        plt.xlabel('servo angle θ (°)')
+        plt.ylabel('TVC angle α (°)')
+        plt.grid()
+        plt.show()
+
     def plot_results(self):
-        import matplotlib.pyplot as plt
         if not hasattr(self, 'alpha_values_simulated'):
             print("Alpha values not simulated yet, try simulate_kinematics()")
             return
@@ -133,3 +148,27 @@ class TVCModel:
         plt.legend()
         plt.show()
 
+    def set_L1(self, L1):
+        self.design_params["L1"] = L1
+        self.design_params["S2_y"] = self.design_params.get("L1", 0)+self.design_params.get("L3", 0)
+
+    def set_L2(self, L2):
+        self.design_params["L2"] = L2
+        self.design_params["S2_x"] = self.design_params.get("L2", 0)
+
+    def set_L3(self, L3):
+        self.design_params["L3"] = L3
+        self.design_params["S2_y"] = self.design_params.get("L1", 0)+self.design_params.get("L3", 0)
+
+    def set_S2_x(self, S2_x):
+        self.design_params["S2_x"] = S2_x
+        self.design_params["L2"] = S2_x
+
+
+    def set_S2_y(self, S2_y):
+        self.design_params["S2_y"] = S2_y
+        if  self.design_params.get("S2_y", 0)-self.design_params.get("L1", 0) > 0:
+            self.design_params["L3"] = self.design_params.get("S2_y", 0)-self.design_params.get("L1", 0)
+        else:
+            print("Warning: failed chaing S2_y, L3 would become negative")
+            return

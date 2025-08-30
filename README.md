@@ -2,7 +2,9 @@
 
 Goal is to generate a TVC mount that approximates your desired behaviour!
 
-![alt text](media/kinematics.PNG)
+![alt text](media/mount.png)
+![alt text](media/kinematics.PNG) 
+
 
 ## Mathmatical description of kinematics
 This is a 3 bar linkage system. Known variables are $S1,S2,L1,L2,L3,\theta$.
